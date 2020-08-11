@@ -1,3 +1,12 @@
+# App data
+data/
+keras/
+mnist_data/
+pytorch/
+tensorflow/
+*.onnx
+*.png
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
