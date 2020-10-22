@@ -6,8 +6,8 @@ MNIST dataset.
 
 #from __future__ import print_function
 #import tensorflow as tf
-import tensorflow.compat.v1 as tf
-tf.disable_v2_behavior()
+import tensorflow as tf
+tf.compat.v1.disable_v2_behavior()
 import tf2onnx
 #from tf2onnx import loader
 #from tensorflow.compat.v1.examples.tutorials.mnist import input_data
@@ -27,8 +27,8 @@ num_input = 784 # MNIST data input (img shape: 28*28)
 num_classes = 10 # MNIST total classes (0-9 digits)
 
 # tf Graph input
-X = tf.placeholder("float", [batch_size, num_input], name="input")
-Y = tf.placeholder("float", [batch_size, num_classes], name="output")
+X = tf.compat.v1.placeholder("float", [batch_size, num_input], name="input")
+Y = tf.compat.v1.placeholder("float", [batch_size, num_classes], name="output")
 
 
 def load_data():
@@ -39,14 +39,14 @@ def load_data():
 # Create model
 def build_model(x):
     weights = {
-        'h1': tf.Variable(tf.random_normal([num_input, n_hidden_1])),
-        'h2': tf.Variable(tf.random_normal([n_hidden_1, n_hidden_2])),
-        'out': tf.Variable(tf.random_normal([n_hidden_2, num_classes]))
+        'h1': tf.Variable(tf.random.normal([num_input, n_hidden_1])),
+        'h2': tf.Variable(tf.random.normal([n_hidden_1, n_hidden_2])),
+        'out': tf.Variable(tf.random.normal([n_hidden_2, num_classes]))
     }
     biases = {
-        'b1': tf.Variable(tf.random_normal([n_hidden_1])),
-        'b2': tf.Variable(tf.random_normal([n_hidden_2])),
-        'out': tf.Variable(tf.random_normal([num_classes]))
+        'b1': tf.Variable(tf.random.normal([n_hidden_1])),
+        'b2': tf.Variable(tf.random.normal([n_hidden_2])),
+        'out': tf.Variable(tf.random.normal([num_classes]))
     }
 
     # Hidden fully connected layer with 256 neurons
@@ -61,13 +61,13 @@ def build_model(x):
     model = tf.nn.softmax(out_layer)
 
     # Define loss and optimizer
-    loss_op = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(
-        logits=out_layer, labels=Y))
-    optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
+    loss_op = tf.reduce_mean(input_tensor=tf.nn.softmax_cross_entropy_with_logits(
+        logits=out_layer, labels=tf.stop_gradient(Y)))
+    optimizer = tf.compat.v1.train.AdamOptimizer(learning_rate=learning_rate)
     train_op = optimizer.minimize(loss_op)
 
-    prediction_op = tf.equal(tf.argmax(model, 1), tf.argmax(Y, 1))
-    accuracy_op = tf.reduce_mean(tf.cast(prediction_op, tf.float32))
+    prediction_op = tf.equal(tf.argmax(input=model, axis=1), tf.argmax(input=Y, axis=1))
+    accuracy_op = tf.reduce_mean(input_tensor=tf.cast(prediction_op, tf.float32))
 
     return model, loss_op, train_op, prediction_op, accuracy_op
 
@@ -82,11 +82,11 @@ def train_model(train, test, model, loss_op, train_op):
     # Evaluate model
 
     # Initialize the variables (i.e. assign their default value)
-    init = tf.global_variables_initializer()
+    init = tf.compat.v1.global_variables_initializer()
 
     # Start training
     #with tf.Session() as sess:
-    sess = tf.Session()
+    sess = tf.compat.v1.Session()
 
     # Run the initializer
     sess.run(init)
@@ -120,7 +120,7 @@ def predict(sess, prediction_op, images, labels):
 
 
 def save_framework_model(sess):
-    saver = tf.train.Saver()
+    saver = tf.compat.v1.train.Saver()
     save_path = saver.save(sess, './tensorflow/tensorflow_model.ckpt')
 
 
@@ -128,7 +128,7 @@ def convert_to_onnx(output_graph_def):
     
     #output_graph_def = tf2onnx.loader.freeze_session(sess, output_names=["output:0"])
 
-    tf.reset_default_graph()
+    tf.compat.v1.reset_default_graph()
     with tf.Graph().as_default() as tf_graph:
         tf.import_graph_def(output_graph_def, name='input')
 

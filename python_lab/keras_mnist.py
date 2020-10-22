@@ -37,7 +37,6 @@ def load_data():
     x_train = np.expand_dims(x_train, -1)
     x_test = np.expand_dims(x_test, -1)
 
-
     # convert class vectors to binary class matrices
     y_train = keras.utils.to_categorical(y_train, num_classes)
     y_test = keras.utils.to_categorical(y_test, num_classes)

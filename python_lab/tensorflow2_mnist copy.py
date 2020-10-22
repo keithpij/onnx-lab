@@ -4,13 +4,13 @@ import tensorflow_datasets as tfds
 
 # Declare training variables
 padding = "SAME"  #@param ['SAME', 'VALID' ]
-num_output_classes = 10  #@param {type: "number"}
-batch_size = 128  #@param {type: "number"}
+num_output_classes = 102  #@param {type: "number"}
+batch_size = 32  #@param {type: "number"}
 learning_rate = 0.001  #@param {type: "number"}
 
 
 # Fetch the dataset.
-dataset_name = 'mnist'  #@param {type: "string"}
+dataset_name = 'horses_or_humans'  #@param {type: "string"}
 
 dataset = tfds.load(name=dataset_name, split=tfds.Split.TRAIN)
 dataset = dataset.shuffle(1024).batch(batch_size)
@@ -99,14 +99,14 @@ def model( x ) :
     d3 = dense( d2 , weights[ 14 ] )
     d4 = dense( d3 , weights[ 15 ] )
     d5 = dense( d4 , weights[ 16 ] )
-    logits = tf.matmul(d5, weights[17])
+    logits = tf.matmul( d5 , weights[ 17 ] )
 
-    return tf.nn.softmax(logits)
+    return tf.nn.softmax( logits )
 
 
 # Define the loss function and the optimizer using tf.GradientTape
 def loss(pred, target):
-    return tf.losses.categorical_crossentropy(target, pred)
+    return tf.losses.categorical_crossentropy( target , pred )
 
 optimizer = tf.optimizers.Adam( learning_rate )
 
@@ -121,7 +121,7 @@ def train_step( model, inputs , outputs ):
 # Train the model
 num_epochs = 256 #@param {type: "number"}
 
-for e in range(num_epochs):
+for e in range( num_epochs ):
     for features in dataset:
-        image, label = features['image'], features['label']
-        train_step(model, image, tf.one_hot(label, depth=3))
+        image , label = features[ 'image' ] , features[ 'label' ]
+        train_step( model , image , tf.one_hot( label , depth=3 ) )

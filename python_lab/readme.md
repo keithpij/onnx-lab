@@ -41,3 +41,6 @@ onnxruntime.capi.onnxruntime_pybind11_state.InvalidArgument: [ONNXRuntimeError] 
 
 
 https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/tutorials/mnist/input_data.py
+
+# To run a .NET app:
+dotnet run
